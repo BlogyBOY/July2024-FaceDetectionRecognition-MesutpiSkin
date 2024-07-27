@@ -27,9 +27,9 @@ namespace FaceDetectionAndRecognition
         private Image<Bgr, Byte> bgrFrame = null;
         private Image<Gray, Byte> detectedFace = null;
         private List<FaceData> faceList = new List<FaceData>();
-        private VectorOfMat imageList = new VectorOfMat();
+        private VectorOfMat imageList = null;
         private List<string> nameList = new List<string>();
-        private VectorOfInt labelList = new VectorOfInt();
+        private VectorOfInt labelList = null;
 
         private EigenFaceRecognizer recognizer;
         private Timer captureTimer;
@@ -79,6 +79,9 @@ namespace FaceDetectionAndRecognition
         public WFFaceRecognition()
         {
             InitializeComponent();
+            imageList = new VectorOfMat();
+            labelList = new VectorOfInt();
+
             captureTimer = new Timer()
             {
                 Interval = Config.TimerResponseValue
@@ -121,7 +124,7 @@ namespace FaceDetectionAndRecognition
             }
             //Save detected face
             detectedFace = detectedFace.Resize(100, 100, Inter.Cubic);
-            detectedFace.Save(Config.FacePhotosPath +"face"+ (faceList.Count + 1) + Config.ImageFileExtension);
+            detectedFace.Save(Config.FacePhotosPath + "face" + (faceList.Count + 1) + Config.ImageFileExtension);
             StreamWriter writer = new StreamWriter(Config.FaceListTextFile, true);
             string personName = Microsoft.VisualBasic.Interaction.InputBox("Your Name");
             writer.WriteLine(String.Format("face{0}:{1}", (faceList.Count + 1), personName));
@@ -204,7 +207,7 @@ namespace FaceDetectionAndRecognition
             reader.Close();
 
             // Train recogniser
-            if (imageList.Size > 0)
+            if (imageList != null && imageList.Size > 0)
             {
                 recognizer = new EigenFaceRecognizer(imageList.Size);
                 recognizer.Train(imageList, labelList);
@@ -214,8 +217,10 @@ namespace FaceDetectionAndRecognition
 
         private void ProcessFrame()
         {
-            bgrFrame = videoCapture.QueryFrame().ToImage<Bgr, Byte>();
-
+            if (videoCapture != null && !videoCapture.QueryFrame().IsEmpty)
+            {
+                bgrFrame = videoCapture.QueryFrame().ToImage<Bgr, Byte>();
+            }
             if (bgrFrame != null)
             {
                 try
@@ -247,11 +252,11 @@ namespace FaceDetectionAndRecognition
 
         private void FaceRecognition()
         {
-            if (imageList.Size != 0)
+            if (imageList != null && imageList.Size > 0)
             {
                 //Eigen Face Algorithm
                 FaceRecognizer.PredictionResult result = recognizer.Predict(detectedFace.Resize(100, 100, Inter.Cubic));
-                FaceName = nameList[result.Label]; 
+                FaceName = nameList[result.Label];
                 CameraCaptureFace = detectedFace.ToBitmap();
             }
             else

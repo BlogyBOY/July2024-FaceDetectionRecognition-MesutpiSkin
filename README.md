@@ -9,6 +9,12 @@ English | [Türkçe](./README.tr-TR.md)
 </div>
 
 
+### Reference how-to-implement-face-detection-in-c-sharp
+**Nagendra Upwanshi
+how-to-implement-face-detection-in-c-sharp
+site URL:
+https://camera-sdk.com/p_6767-how-to-implement-face-detection-in-c-sharp.html
+
 
 ### What is Emgu CV?
 
